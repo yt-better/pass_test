@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MySQL 知识点整理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            color: #e0e0e0;
+            line-height: 1.8;
+            overflow-x: hidden;
+            background: #0a0e27
+        }
+
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1
+        }
+
+        h1 {
+            text-align: center;
+            color: #00d4ff;
+            font-size: 2.5em;
+            margin: 30px 0;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            letter-spacing: 5px
+        }
+
+        h2 {
+            color: #00d4ff;
+            font-size: 1.8em;
+            margin: 40px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.3)
+        }
+
+        h3 {
+            color: #ff6b6b;
+            font-size: 1.4em;
+            margin: 30px 0 15px
+        }
+
+        h4 {
+            color: #ffd93d;
+            font-size: 1.2em;
+            margin: 20px 0 10px
+        }
+
+        .card {
+            background: rgba(10, 20, 50, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95em
+        }
+
+        th {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid rgba(0, 212, 255, 0.3)
+        }
+
+        td {
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #c0c0c0
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.03)
+        }
+
+        tr:hover {
+            background: rgba(0, 212, 255, 0.1)
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #ffd93d;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 15px 0
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #a8d8ea;
+            font-size: 0.9em;
+            line-height: 1.6
+        }
+
+        .sql-keyword {
+            color: #ff6b6b
+        }
+
+        .sql-string {
+            color: #ffd93d
+        }
+
+        .sql-comment {
+            color: #6c757d
+        }
+
+        .math {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 1.1em;
+            color: #a8d8ea;
+            border: 1px solid rgba(0, 212, 255, 0.2)
+        }
+
+        .highlight {
+            color: #00d4ff;
+            font-weight: bold
+        }
+
+        .warning {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
+            margin: 15px 0
+        }
+
+        .success {
+            color: #51cf66;
+            background: rgba(81, 207, 102, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #51cf66;
+            margin: 15px 0
+        }
+
+        .er-container {
+            background: rgba(10, 20, 50, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center
+        }
+
+        .er-container img {
+            max-width: 100%;
+            border-radius: 10px
+        }
+
+        .er-placeholder {
+            border: 3px dashed #ffd93d;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            color: #ffd93d;
+            font-size: 1.2em;
+            background: rgba(255, 217, 61, 0.05)
+        }
+
+        .er-placeholder .hint {
+            color: #ff6b6b;
+            font-size: 0.9em;
+            margin-top: 15px
+        }
+
+        .step-box {
+            background: rgba(0, 212, 255, 0.05);
+            border-left: 4px solid #00d4ff;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 10px 10px 0
+        }
+
+        .question-box {
+            background: rgba(255, 107, 107, 0.08);
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0
+        }
+
+        .question-box h4 {
+            color: #ff6b6b;
+            margin: 0 0 10px
+        }
+
+        .compare-table th {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b
+        }
+
+        ol,
+        ul {
+            margin: 15px 0 15px 30px
+        }
+
+        li {
+            margin: 8px 0;
+            color: #c0c0c0
+        }
+
+        .arrow-flow {
+            text-align: center;
+            font-size: 1.2em;
+            color: #ffd93d;
+            margin: 10px 0
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3)
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 212, 255, 0.3);
+            border-radius: 4px
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 212, 255, 0.5)
+        }
+
+        @media(max-width:768px) {
+            h1 {
+                font-size: 1.8em
+            }
+
+            h2 {
+                font-size: 1.4em
+            }
+
+            .card {
+                padding: 15px
+            }
+
+            table {
+                font-size: 0.85em
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas-bg"></canvas>
+    <div class="container">
+        <h1>MySQL 知识点整理</h1>
+
+        <h2>一、简答题</h2>
+
+        <div class="card">
+            <h3>1. 两段封锁协议</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>什么是两段封锁协议？请写出两段封锁协议的内容。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <ol>
+                    <li>对任何一个数据进行读/写操作之前，事务必须获得对数据的封锁</li>
+                    <li>在释放一个封锁之后，事务不再获得任何其他封锁</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>2. 最小函数依赖集步骤</h3>
+            <h4>函数依赖规则（Armstrong 公理系统）</h4>
+            <table>
+                <tr>
+                    <th>规则</th>
+                    <th>内容</th>
+                    <th>表达式</th>
+                </tr>
+                <tr>
+                    <td>A1(自反性)</td>
+                    <td>如果 Y ⊆ X ⊆ U</td>
+                    <td>则 X → Y</td>
+                </tr>
+                <tr>
+                    <td>A2(增广性)</td>
+                    <td>如果 X → Y 且 Z ⊆ U</td>
+                    <td>则 XZ → YZ</td>
+                </tr>
+                <tr>
+                    <td>A3(传递性)</td>
+                    <td>如果 X → Y 且 Y → Z</td>
+                    <td>则 X → Z</td>
+                </tr>
+                <tr>
+                    <td>B1(合并性)</td>
+                    <td>如果 X → Y 且 X → Z</td>
+                    <td>则 X → YZ</td>
+                </tr>
+                <tr>
+                    <td>B2(分解性)</td>
+                    <td>如果 X → YZ</td>
+                    <td>则 X → Y、X → Z</td>
+                </tr>
+                <tr>
+                    <td>B3(结合性)</td>
+                    <td>如果 X → Y 且 W → Z</td>
+                    <td>则 XW → YZ</td>
+                </tr>
+                <tr>
+                    <td>B4(伪传递性)</td>
+                    <td>如果 X → Y 且 WY → Z</td>
+                    <td>则 XW → Z</td>
+                </tr>
+            </table>
+
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>设有关系模式 R，属性集 U = {A,B,C,X,Y}，函数依赖集 F={Z→A, B→X, AX→Y, ZB→Y}，试证明 ZB→Y 可由 F 导出。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <p>1. 因为 Z→A，B→X，由 B3 可知，ZB→AX<br>
+                    2. 因为 ZB→AX，AX→Y，由 A3 可知，ZB→Y<br><br>
+                    即 ZB→Y 可由 F 中其他函数依赖导出，所以 ZB→Y 是冗余的函数依赖。</p>
+            </div>
+
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>什么是最小函数依赖集？请写出最小函数依赖集需要满足的条件。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <p>如果函数依赖集 F 满足下列条件，则称 F 为一个<strong>最小函数依赖集</strong>：</p>
+                <ol>
+                    <li>每个函数依赖的右边都是单属性（可通过 B2 实现）</li>
+                    <li>函数依赖集 F 中没有冗余的函数依赖</li>
+                    <li>F 中每个函数依赖的左边没有多余的属性</li>
+                </ol>
+                <p>显然，每个函数依赖集至少存在一个最小依赖集，但并不一定唯一。</p>
+            </div>
+
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>设 F 是关系模式 R(A,B,C) 的函数依赖集，F={A→BC, B→C, A→B, AB→C}，试求最小函数依赖集。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <p>1. 先把 F 写成右边单属性形式：F={A→B, A→C, B→C, A→B, AB→C}，删除一个 A→B，得 F={A→B, A→C, B→C, AB→C}<br>
+                    2. A→C 可从 A→B 和 B→C 推出，冗余，删去，得 F={A→B, B→C, AB→C}<br>
+                    3. AB→C 中，因为有 B→C，A 多余，删去，得 <span class="highlight">F={A→B, B→C}</span></p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>3. 数据库三级模式以及两级映射</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>什么是数据库的三级模式？什么是数据库的两级映射？数据独立性包括哪两种？分别通过什么映射实现？</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <h4>三级模式</h4>
+                <ul>
+                    <li><span class="highlight">外模式</span>（用户模式/子模式）</li>
+                    <li><span class="highlight">概念模式</span>（模式/逻辑模式）</li>
+                    <li><span class="highlight">内模式</span>（存储模式/物理模式）</li>
+                </ul>
+                <h4>两级映射</h4>
+                <ul>
+                    <li><span class="highlight">外模式/模式映射</span> → 保证逻辑独立性</li>
+                    <li><span class="highlight">模式/内模式映射</span> → 保证物理独立性</li>
+                </ul>
+                <h4>数据独立性</h4>
+                <p><strong>物理独立性</strong>：应用程序与存储在磁盘上的数据库中的数据是独立的。通过模式/内模式映射实现。<br>
+                    <strong>逻辑独立性</strong>：用户的应用程序与逻辑结构是相互独立的。通过外模式/模式映射实现。
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>4. 并发执行会出现的问题</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>数据库并发执行会出现哪些问题？请分别说明。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <table>
+                    <tr>
+                        <th>问题</th>
+                        <th>说明</th>
+                    </tr>
+                    <tr>
+                        <td>丢失更新</td>
+                        <td>两个事务同时修改同一数据，后提交的事务覆盖了先提交的事务的修改</td>
+                    </tr>
+                    <tr>
+                        <td>不可重复读</td>
+                        <td>同一事务内多次读取同一数据，结果不一致（被其他事务修改）</td>
+                    </tr>
+                    <tr>
+                        <td>读脏数据</td>
+                        <td>读取了其他事务未提交的数据，随后该事务回滚</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>5. 为什么先写日志后写数据库（WAL 协议）</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>为什么数据库系统采用"先写日志后写数据库"的策略？请说明原因。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <ol>
+                    <li><strong>保证故障可恢复</strong> — 系统崩溃时，日志已记录操作，可通过 UNDO/REDO 恢复一致性</li>
+                    <li><strong>防止数据不一致</strong> — 若先写数据库而日志丢失，故障后无法撤销未提交事务的修改</li>
+                    <li><strong>WAL 机制要求</strong> — 日志是恢复的唯一依据，必须先落盘才能确保数据库状态可回溯</li>
+                </ol>
+            </div>
+        </div>
+
+        <h2>二、SQL 代码和关系表达式</h2>
+
+        <div class="card">
+            <h3>表结构</h3>
+            <h4>S（学生表）</h4>
+            <table>
+                <tr>
+                    <th>列名</th>
+                    <th>数据类型</th>
+                    <th>允许为空</th>
+                    <th>特殊限制</th>
+                </tr>
+                <tr>
+                    <td>Sno</td>
+                    <td>char(8)</td>
+                    <td>不允许</td>
+                    <td>主键</td>
+                </tr>
+                <tr>
+                    <td>Sname</td>
+                    <td>char(8)</td>
+                    <td>不允许</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Sex</td>
+                    <td>char(2)</td>
+                    <td>允许</td>
+                    <td>取"男"或"女"</td>
+                </tr>
+                <tr>
+                    <td>Dept</td>
+                    <td>varchar(50)</td>
+                    <td>允许</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Age</td>
+                    <td>int</td>
+                    <td>不允许</td>
+                    <td></td>
+                </tr>
+            </table>
+            <h4>C（课程表）</h4>
+            <table>
+                <tr>
+                    <th>列名</th>
+                    <th>数据类型</th>
+                    <th>允许为空</th>
+                    <th>特殊限制</th>
+                </tr>
+                <tr>
+                    <td>Cno</td>
+                    <td>char(3)</td>
+                    <td>不允许</td>
+                    <td>主键</td>
+                </tr>
+                <tr>
+                    <td>Cname</td>
+                    <td>varchar(20)</td>
+                    <td>允许</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Ccredit</td>
+                    <td>int</td>
+                    <td>不允许</td>
+                    <td></td>
+                </tr>
+            </table>
+            <h4>SC（选课表）</h4>
+            <table>
+                <tr>
+                    <th>列名</th>
+                    <th>数据类型</th>
+                    <th>允许为空</th>
+                    <th>特殊限制</th>
+                </tr>
+                <tr>
+                    <td>Sno</td>
+                    <td>char(8)</td>
+                    <td>不允许</td>
+                    <td>组合主键，外键 → S(Sno)</td>
+                </tr>
+                <tr>
+                    <td>Cno</td>
+                    <td>char(3)</td>
+                    <td>不允许</td>
+                    <td>组合主键，外键 → C(Cno)</td>
+                </tr>
+                <tr>
+                    <td>Grade</td>
+                    <td>int</td>
+                    <td>允许</td>
+                    <td>取值范围 0~100</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>基础查询</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>1. 查询课号为 '01' 的课程信息。<br>
+                    2. 查询学分为 3 的课程号和课程名（写出 SQL 语句和关系代数表达式）。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <h4>1. 查询课号为 '01' 的课程信息</h4>
+                <pre><code><span class="sql-keyword">SELECT</span> * <span class="sql-keyword">FROM</span> C <span class="sql-keyword">WHERE</span> Cno = <span class="sql-string">'01'</span>;</code></pre>
+                <h4>2. 查询学分为 3 的课程号和课程名</h4>
+                <div class="math">π<sub>Cno, Cname</sub>(σ<sub>Ccredit=3</sub>(C))</div>
+                <pre><code><span class="sql-keyword">SELECT</span> Cno, Cname <span class="sql-keyword">FROM</span> C <span class="sql-keyword">WHERE</span> Ccredit = <span class="sql-string">3</span>;</code></pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>SQL 语句练习</h3>
+
+            <div class="question-box">
+                <h4>📌 题目 1</h4>
+                <p>查询选修了 '02' 课程的学生的学号和姓名。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <pre><code><span class="sql-keyword">SELECT</span> S.Sno <span class="sql-keyword">AS</span> 学号, S.Sname <span class="sql-keyword">AS</span> 姓名 
+<span class="sql-keyword">FROM</span> S, SC 
+<span class="sql-keyword">WHERE</span> S.Sno = SC.Sno <span class="sql-keyword">AND</span> SC.Cno = <span class="sql-string">'02'</span>;</code></pre>
+            </div>
+
+            <div class="question-box">
+                <h4>📌 题目 2</h4>
+                <p>查询平均分大于 70 分的课程课号、选课人数和平均分。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <pre><code><span class="sql-keyword">SELECT</span> Cno <span class="sql-keyword">AS</span> 课号, <span class="sql-keyword">COUNT</span>(*) <span class="sql-keyword">AS</span> 选课人数, <span class="sql-keyword">AVG</span>(Grade) <span class="sql-keyword">AS</span> 平均分 
+<span class="sql-keyword">FROM</span> SC
+<span class="sql-keyword">WHERE</span> Grade > <span class="sql-string">70</span>
+<span class="sql-keyword">GROUP BY</span> Cno;</code></pre>
+            </div>
+
+            <div class="question-box">
+                <h4>📌 题目 3</h4>
+                <p>将选修课程号为 '02' 的所有学生的分数加 5 分。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <pre><code><span class="sql-keyword">UPDATE</span> SC
+<span class="sql-keyword">SET</span> Grade = Grade + <span class="sql-string">5</span>
+<span class="sql-keyword">WHERE</span> Cno = <span class="sql-string">'02'</span>;</code></pre>
+            </div>
+
+            <div class="question-box">
+                <h4>📌 题目 4</h4>
+                <p>创建一个存储过程，输入课号、课程名字、学分，增加一条课程数据。并写出调用语句。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <pre><code><span class="sql-keyword">DELIMITER</span> //
+<span class="sql-keyword">CREATE PROCEDURE</span> InsertCourse(
+    <span class="sql-keyword">IN</span> p_Cno <span class="sql-keyword">CHAR</span>(<span class="sql-string">3</span>),
+    <span class="sql-keyword">IN</span> p_Cname <span class="sql-keyword">VARCHAR</span>(<span class="sql-string">20</span>),
+    <span class="sql-keyword">IN</span> p_Ccredit <span class="sql-keyword">INT</span>
+)
+<span class="sql-keyword">BEGIN</span>
+    <span class="sql-keyword">INSERT INTO</span> C <span class="sql-keyword">VALUES</span>(p_Cno, p_Cname, p_Ccredit);
+<span class="sql-keyword">END</span> //
+<span class="sql-keyword">DELIMITER</span> ;
+
+<span class="sql-comment">-- 调用存储过程</span>
+<span class="sql-keyword">CALL</span> InsertCourse(<span class="sql-string">'04'</span>, <span class="sql-string">'数据管理'</span>, <span class="sql-string">4</span>);</code></pre>
+            </div>
+
+            <div class="question-box">
+                <h4>📌 题目 5</h4>
+                <p>创建视图，显示每科最高分的学生信息（学号、姓名、成绩）。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <pre><code><span class="sql-keyword">CREATE VIEW</span> v_max_grade <span class="sql-keyword">AS</span>
+<span class="sql-keyword">SELECT</span> SC.Cno, S.Sno <span class="sql-keyword">AS</span> 学号, S.Sname <span class="sql-keyword">AS</span> 姓名, SC.Grade <span class="sql-keyword">AS</span> 成绩
+<span class="sql-keyword">FROM</span> S, SC
+<span class="sql-keyword">WHERE</span> S.Sno = SC.Sno 
+<span class="sql-keyword">AND</span> SC.Grade = (
+    <span class="sql-keyword">SELECT</span> <span class="sql-keyword">MAX</span>(Grade) 
+    <span class="sql-keyword">FROM</span> SC <span class="sql-keyword">AS</span> SC2 
+    <span class="sql-keyword">WHERE</span> SC2.Cno = SC.Cno
+);</code></pre>
+            </div>
+
+            <div class="question-box">
+                <h4>📌 题目 6</h4>
+                <p>在 S 表中增加一列 School（学校），默认值为 '燕京理工学院'。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <pre><code><span class="sql-keyword">ALTER TABLE</span> S
+<span class="sql-keyword">ADD</span> School <span class="sql-keyword">VARCHAR</span>(<span class="sql-string">50</span>) <span class="sql-keyword">DEFAULT</span> <span class="sql-string">'燕京理工学院'</span>;</code></pre>
+            </div>
+
+            <div class="question-box">
+                <h4>📌 题目 7</h4>
+                <p>把 S 表的查询权限授权给 root 用户。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <pre><code><span class="sql-keyword">GRANT SELECT ON</span> S <span class="sql-keyword">TO</span> <span class="sql-string">'root'</span>@<span class="sql-string">'localhost'</span>;</code></pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>关系代数表达式</h3>
+            <h4>常用符号对照表</h4>
+            <table>
+                <tr>
+                    <th>运算</th>
+                    <th>符号</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td>选择</td>
+                    <td>σ</td>
+                    <td>按条件筛选行</td>
+                </tr>
+                <tr>
+                    <td>投影</td>
+                    <td>π</td>
+                    <td>选择列</td>
+                </tr>
+                <tr>
+                    <td>并</td>
+                    <td>∪</td>
+                    <td>合并两个关系</td>
+                </tr>
+                <tr>
+                    <td>交</td>
+                    <td>∩</td>
+                    <td>取交集</td>
+                </tr>
+                <tr>
+                    <td>差</td>
+                    <td>-</td>
+                    <td>取差集</td>
+                </tr>
+                <tr>
+                    <td>笛卡尔积</td>
+                    <td>×</td>
+                    <td>两表所有组合</td>
+                </tr>
+                <tr>
+                    <td>自然连接</td>
+                    <td>⋈</td>
+                    <td>按相同属性连接</td>
+                </tr>
+                <tr>
+                    <td>θ 连接</td>
+                    <td>⋈<sub>θ</sub></td>
+                    <td>按条件连接</td>
+                </tr>
+                <tr>
+                    <td>除</td>
+                    <td>÷</td>
+                    <td>包含全部</td>
+                </tr>
+                <tr>
+                    <td>重命名</td>
+                    <td>ρ</td>
+                    <td>修改关系名</td>
+                </tr>
+            </table>
+
+            <div class="question-box">
+                <h4>📌 题目 1</h4>
+                <p>查询选修了张三选修的所有课程的学生学号。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <div class="math">π<sub>Sno</sub>(σ<sub>Sname='张三'</sub>(S) ⋈ SC)</div>
+            </div>
+
+            <div class="question-box">
+                <h4>📌 题目 2</h4>
+                <p>查询 C 语言课程成绩不及格的学生的学号和姓名。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <div class="math">π<sub>Sno, Sname</sub>(σ<sub>Grade < 60</sub>(S ⋈ SC ⋈ σ<sub>Cname='C语言'</sub>(C)))
+                </div>
+            </div>
+        </div>
+
+        <h2>三、第一范式到第三范式</h2>
+
+        <div class="card">
+            <div class="arrow-flow">
+                1NF（一张大表，属性不可再分）<br>
+                ↓<br>
+                2NF（消除部分函数依赖，非主属性完全依赖于候选键）<br>
+                ↓<br>
+                3NF（消除传递依赖，非主属性不依赖于其他非主属性）
+            </div>
+
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>设有关系模式 R(运动员编号, 比赛项目, 成绩, 比赛类别, 比赛主管)，用于存储运动员比赛成绩及比赛类别、主管等信息。<br><br>
+                    <strong>语义规定：</strong>每个运动员每参加一个比赛项目只有一个成绩；每个比赛项目只属于一个比赛类别；每个比赛类别只有一个比赛主管。<br><br>
+                    试回答下列问题：<br>
+                    1. 根据上述规定，写出模式 R 的基本函数依赖集和候选键。<br>
+                    2. 说明 R 不是 2NF 的理由，并把 R 分解成 2NF 模式集。<br>
+                    3. 进而分解成 3NF 模式集。
+                </p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <div class="step-box">
+                    <strong>1. 基本函数依赖集和候选键</strong><br>
+                    F = { (运动员编号, 比赛项目) → 成绩, 比赛项目 → 比赛类别, 比赛类别 → 比赛主管 }<br>
+                    候选键：<span class="highlight">(运动员编号, 比赛项目)</span>
+                </div>
+                <div class="step-box">
+                    <strong>2. 分解为 2NF</strong><br>
+                    R 中存在部分函数依赖：比赛项目 → (比赛类别, 比赛主管)<br>
+                    分解为：<br>
+                    • R1(运动员编号, 比赛项目, 成绩) — 主键：(运动员编号, 比赛项目)<br>
+                    • R2(比赛项目, 比赛类别, 比赛主管) — 主键：比赛项目
+                </div>
+                <div class="step-box">
+                    <strong>3. 分解为 3NF</strong><br>
+                    R2 中存在传递依赖：比赛项目 → 比赛类别 → 比赛主管<br>
+                    继续分解：<br>
+                    • R21(比赛项目, 比赛类别) — 主键：比赛项目<br>
+                    • R22(比赛类别, 比赛主管) — 主键：比赛类别<br><br>
+                    最终 3NF：<span class="highlight">R1, R21, R22</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>【例题】医疗关系分解为 3NF</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>现有关系：医疗(病人编号, 病人姓名, 病人性别, 病人年龄, 医生编号, 医生姓名, 医生职称, 诊断日期, 诊断结果)<br><br>
+                    将"医疗"关系分解为 3NF（写明分解后每一个关系模式及其函数依赖集、主键、外键）。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <div class="step-box">
+                    <strong>函数依赖集：</strong><br>
+                    F = {<br>
+                    &nbsp;&nbsp;病人编号 → (病人姓名, 病人性别, 病人年龄),<br>
+                    &nbsp;&nbsp;医生编号 → (医生姓名, 医生职称),<br>
+                    &nbsp;&nbsp;(病人编号, 医生编号, 诊断日期) → 诊断结果<br>
+                    }
+                </div>
+                <table>
+                    <tr>
+                        <th>关系模式</th>
+                        <th>函数依赖</th>
+                        <th>主键</th>
+                        <th>外键</th>
+                    </tr>
+                    <tr>
+                        <td>病人(病人编号, 病人姓名, 病人性别, 病人年龄)</td>
+                        <td>病人编号 → (病人姓名, 病人性别, 病人年龄)</td>
+                        <td>病人编号</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>医生(医生编号, 医生姓名, 医生职称)</td>
+                        <td>医生编号 → (医生姓名, 医生职称)</td>
+                        <td>医生编号</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>医疗(病人编号, 医生编号, 诊断日期, 诊断结果)</td>
+                        <td>(病人编号, 医生编号, 诊断日期) → 诊断结果</td>
+                        <td>(病人编号, 医生编号, 诊断日期)</td>
+                        <td>病人编号 → 病人，医生编号 → 医生</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <h2>四、E-R 图设计</h2>
+
+        <!-- ==================== 插入图片位置 1 ==================== -->
+        <!-- 请在这里插入图片：仓库管理系统 E-R 图 -->
+        <!-- 图片文件名建议：er_warehouse.png -->
+        <div class="card">
+            <h3>【例题】仓库管理系统 E-R 图</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>以下是某数据库系统与数据库设计相关的语义，请根据语义进行概念结构设计，画出 E-R 图，并写出转换的关系模式（标注主键、外键）。<br><br>
+                    1. 一个仓库可以存放多个零件，一种零件可以存放在多个仓库中，存储产生库存量的属性；仓库有仓库号、仓库类型和面积，零件有零件号、名称、单价、描述等属性。<br>
+                    2. 一个职工只能在一个仓库工作，一个仓库有多个职工当保管员；职工有职工号、姓名、性别、职务、出生年月属性。<br>
+                    3. 职工之间有领导与被领导关系，仓库主任领导若干保管员。<br>
+                    4.
+                    一个供应商可以供应若干项目多种零件；而一个项目可以使用不同供应商供应的多种零件；一种零件可由不同供应商供给多个工程项目，供应产生数量的属性。供应商有供应商号、姓名、住址、电话、账号，项目有项目号、预算、开工日期等属性。
+                </p>
+            </div>
+            <div class="er-container">
+                <div class="er-placeholder">
+                    <img src="./market.png" alt="仓库管理系统 E-R 图"><br>
+                    <!-- <small>er_warehouse.png / er_warehouse.jpg</small> -->
+                    <div class="hint">提示：矩形=实体，菱形=联系，椭圆=联系属性，1/m/n/p 标注在连线上</div>
+                </div>
+            </div>
+            <div class="success">
+                <h4>✅ 答案 — 转换的关系模式</h4>
+                <table>
+                    <tr>
+                        <th>关系模式</th>
+                        <th>主键</th>
+                        <th>外键</th>
+                    </tr>
+                    <tr>
+                        <td>仓库(仓库号, 仓库类型, 仓库面积)</td>
+                        <td>仓库号</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>零件(零件号, 名称, 单价, 描述)</td>
+                        <td>零件号</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>职工(职工号, 姓名, 性别, 职务, 出生年月, 仓库号, 领导职工号)</td>
+                        <td>职工号</td>
+                        <td>仓库号 → 仓库，领导职工号 → 职工</td>
+                    </tr>
+                    <tr>
+                        <td>项目(项目号, 预算, 开工日期)</td>
+                        <td>项目号</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>供应商(供应商号, 姓名, 住址, 电话, 账号)</td>
+                        <td>供应商号</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>存放(仓库号, 零件号, 库存量)</td>
+                        <td>(仓库号, 零件号)</td>
+                        <td>仓库号 → 仓库，零件号 → 零件</td>
+                    </tr>
+                    <tr>
+                        <td>供应(项目号, 供应商号, 零件号, 数量)</td>
+                        <td>(项目号, 供应商号, 零件号)</td>
+                        <td>项目号 → 项目，供应商号 → 供应商，零件号 → 零件</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- ==================== 插入图片位置 1 结束 ==================== -->
+
+        <!-- ==================== 插入图片位置 2 ==================== -->
+        <!-- 请在这里插入图片：车辆管理系统 E-R 图 -->
+        <!-- 图片文件名建议：er_vehicle.png -->
+        <div class="card">
+            <h3>【例题】车辆管理系统 E-R 图</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>某汽运公司有若干车队，每个车队有若干车辆和司机，为了提升效率，需要开发一个车辆管理系统。请根据下述需求描述完成该系统的数据库设计。<br><br>
+                    1. 记录车队的信息，包括车队号、车队名。记录车辆的信息，包括牌照号、厂家、出厂日期。<br>
+                    2. 记录司机的信息，包括司机编号、姓名、电话。<br>
+                    3.
+                    车队和司机有"聘用"联系，每个车队可以聘用若干司机，但每个司机只能应聘于一个车队，车队聘用司机有聘期；每个车队可以有若干车辆，但每辆车只能属于一个车队；每个司机可以使用多辆汽车，每辆汽车可以被多个司机使用，司机使用车辆有使用日期和公里数。<br><br>
+                    要求：画出 E-R 图，写出转换的关系模式并标注每个关系模式的主键、外键。</p>
+            </div>
+            <div class="er-container">
+                <div class="er-placeholder">
+                    <img src="./company_car.png" alt="车辆管理系统 E-R 图"><br>
+                    <!-- <small>er_vehicle.png / er_vehicle.jpg</small> -->
+                    <div class="hint">提示：矩形=实体，菱形=联系，椭圆=联系属性，1/m/n 标注在连线上</div>
+                </div>
+            </div>
+            <div class="success">
+                <h4>✅ 答案 — 转换的关系模式</h4>
+                <table>
+                    <tr>
+                        <th>关系模式</th>
+                        <th>主键</th>
+                        <th>外键</th>
+                    </tr>
+                    <tr>
+                        <td>车队(车队号, 车队名)</td>
+                        <td>车队号</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>车辆(牌照号, 厂家, 出厂日期, 车队号)</td>
+                        <td>牌照号</td>
+                        <td>车队号 → 车队</td>
+                    </tr>
+                    <tr>
+                        <td>司机(司机编号, 姓名, 电话, 车队号, 聘期)</td>
+                        <td>司机编号</td>
+                        <td>车队号 → 车队</td>
+                    </tr>
+                    <tr>
+                        <td>使用(牌照号, 司机编号, 日期, 公里数)</td>
+                        <td>(牌照号, 司机编号, 日期)</td>
+                        <td>牌照号 → 车辆，司机编号 → 司机</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- ==================== 插入图片位置 2 结束 ==================== -->
+
+        <h2>五、补充知识点</h2>
+
+        <div class="card">
+            <h3>1. ALTER 语句（修改表结构）</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>写出 ALTER TABLE 语句的常见用法（添加列、修改列、删除列、添加约束、删除约束、修改表名），并给出基于 S、SC、C 表的示例。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <h4>添加列</h4>
+                <pre><code><span class="sql-comment">-- 在 S 表中添加 Phone 列</span>
+<span class="sql-keyword">ALTER TABLE</span> S <span class="sql-keyword">ADD</span> Phone <span class="sql-keyword">CHAR</span>(<span class="sql-string">11</span>);
+
+<span class="sql-comment">-- 在 SC 表中添加 ExamDate 列</span>
+<span class="sql-keyword">ALTER TABLE</span> SC <span class="sql-keyword">ADD</span> ExamDate <span class="sql-keyword">DATE</span> <span class="sql-keyword">DEFAULT</span> <span class="sql-keyword">CURDATE</span>();
+
+<span class="sql-comment">-- 在 C 表中添加 Semester 列，放在 Ccredit 列之后</span>
+<span class="sql-keyword">ALTER TABLE</span> C <span class="sql-keyword">ADD</span> Semester <span class="sql-keyword">INT</span> <span class="sql-keyword">AFTER</span> Ccredit;</code></pre>
+                <h4>修改列</h4>
+                <pre><code><span class="sql-comment">-- 修改 S 表中 Sname 的长度为 20</span>
+<span class="sql-keyword">ALTER TABLE</span> S <span class="sql-keyword">MODIFY</span> Sname <span class="sql-keyword">VARCHAR</span>(<span class="sql-string">20</span>);
+
+<span class="sql-comment">-- 修改列名（将 Sex 改为 Gender）</span>
+<span class="sql-keyword">ALTER TABLE</span> S <span class="sql-keyword">CHANGE</span> Sex Gender <span class="sql-keyword">CHAR</span>(<span class="sql-string">2</span>);</code></pre>
+                <h4>删除列</h4>
+                <pre><code><span class="sql-keyword">ALTER TABLE</span> S <span class="sql-keyword">DROP COLUMN</span> Phone;
+<span class="sql-keyword">ALTER TABLE</span> SC <span class="sql-keyword">DROP COLUMN</span> ExamDate;</code></pre>
+                <h4>添加/删除约束</h4>
+                <pre><code><span class="sql-comment">-- 添加 CHECK 约束</span>
+<span class="sql-keyword">ALTER TABLE</span> S <span class="sql-keyword">ADD CONSTRAINT</span> chk_age <span class="sql-keyword">CHECK</span> (Age <span class="sql-keyword">BETWEEN</span> <span class="sql-string">15</span> <span class="sql-keyword">AND</span> <span class="sql-string">50</span>);
+
+<span class="sql-comment">-- 删除约束</span>
+<span class="sql-keyword">ALTER TABLE</span> S <span class="sql-keyword">DROP CONSTRAINT</span> chk_age;</code></pre>
+                <h4>修改表名</h4>
+                <pre><code><span class="sql-keyword">ALTER TABLE</span> S <span class="sql-keyword">RENAME TO</span> Student;</code></pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>2. DROP 语句（删除数据库对象）</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>写出 DROP 语句删除各种数据库对象的语法（表、数据库、视图、索引、存储过程），并说明注意事项。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <div class="warning">
+                    <strong>注意：</strong>DROP 删除后不可恢复，需谨慎使用！
+                </div>
+                <pre><code><span class="sql-comment">-- 删除表</span>
+<span class="sql-keyword">DROP TABLE</span> SC;
+<span class="sql-keyword">DROP TABLE IF EXISTS</span> S;
+
+<span class="sql-comment">-- 删除数据库</span>
+<span class="sql-keyword">DROP DATABASE</span> school;
+
+<span class="sql-comment">-- 删除视图</span>
+<span class="sql-keyword">DROP VIEW</span> v_max_grade;
+
+<span class="sql-comment">-- 删除索引</span>
+<span class="sql-keyword">DROP INDEX</span> idx_sname <span class="sql-keyword">ON</span> S;
+
+<span class="sql-comment">-- 删除存储过程</span>
+<span class="sql-keyword">DROP PROCEDURE</span> InsertCourse;</code></pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>3. DELETE 语句（删除表中的数据）</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>写出 DELETE 语句的各种用法（条件删除、清空数据、多表关联删除、带 LIMIT 删除），并给出基于 S、SC、C 表的示例。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <p>DELETE 保留表结构，可配合 WHERE 条件删除指定数据。</p>
+                <pre><code><span class="sql-comment">-- 删除指定条件的数据</span>
+<span class="sql-keyword">DELETE FROM</span> S <span class="sql-keyword">WHERE</span> Dept = <span class="sql-string">'数学系'</span>;
+<span class="sql-keyword">DELETE FROM</span> SC <span class="sql-keyword">WHERE</span> Cno = <span class="sql-string">'01'</span>;
+
+<span class="sql-comment">-- 清空所有数据（保留表结构）</span>
+<span class="sql-keyword">DELETE FROM</span> SC;
+
+<span class="sql-comment">-- 多表关联删除</span>
+<span class="sql-keyword">DELETE</span> SC <span class="sql-keyword">FROM</span> SC, S
+<span class="sql-keyword">WHERE</span> SC.Sno = S.Sno <span class="sql-keyword">AND</span> S.Sname = <span class="sql-string">'张三'</span>;
+
+<span class="sql-comment">-- 带 LIMIT 的删除</span>
+<span class="sql-keyword">DELETE FROM</span> SC <span class="sql-keyword">ORDER BY</span> Grade <span class="sql-keyword">ASC</span> <span class="sql-keyword">LIMIT</span> <span class="sql-string">10</span>;</code></pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>4. TRUNCATE 与 DELETE 的区别</h3>
+            <div class="question-box">
+                <h4>📌 题目</h4>
+                <p>比较 TRUNCATE 和 DELETE 的区别（从语法、WHERE 条件、执行速度、回滚、触发器、自增计数器、外键约束等方面）。</p>
+            </div>
+            <div class="success">
+                <h4>✅ 答案</h4>
+                <table class="compare-table">
+                    <tr>
+                        <th>特性</th>
+                        <th>DELETE</th>
+                        <th>TRUNCATE</th>
+                    </tr>
+                    <tr>
+                        <td>语法</td>
+                        <td>DELETE FROM 表名</td>
+                        <td>TRUNCATE TABLE 表名</td>
+                    </tr>
+                    <tr>
+                        <td>WHERE 条件</td>
+                        <td>支持</td>
+                        <td>不支持</td>
+                    </tr>
+                    <tr>
+                        <td>执行速度</td>
+                        <td>较慢（逐行删除）</td>
+                        <td>较快（直接删数据页）</td>
+                    </tr>
+                    <tr>
+                        <td>回滚</td>
+                        <td>支持 ROLLBACK</td>
+                        <td>不支持（自动提交）</td>
+                    </tr>
+                    <tr>
+                        <td>触发器</td>
+                        <td>会触发</td>
+                        <td>不会触发</td>
+                    </tr>
+                    <tr>
+                        <td>自增计数器</td>
+                        <td>不变</td>
+                        <td>重置为初始值</td>
+                    </tr>
+                    <tr>
+                        <td>外键约束</td>
+                        <td>受限制</td>
+                        <td>有外键时不能执行</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>5. 其他补充知识点</h3>
+            <table>
+                <tr>
+                    <th>知识点</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td>数据库物理结构设计与具体的 DBMS 系统有关</td>
+                    <td>不同的 DBMS（MySQL、Oracle、SQL Server）物理存储方式不同</td>
+                </tr>
+                <tr>
+                    <td>规范化过程</td>
+                    <td>投影分解为两个及两个以上的关系模式</td>
+                </tr>
+                <tr>
+                    <td>概念结构设计步骤</td>
+                    <td>抽象 → 设计局部视图 → 合并取消冲突 → 修改重构消除冗余</td>
+                </tr>
+                <tr>
+                    <td>静态副本恢复</td>
+                    <td>数据处于一致性状态</td>
+                </tr>
+                <tr>
+                    <td>存储过程</td>
+                    <td>可以调用多次，提高代码复用性</td>
+                </tr>
+                <tr>
+                    <td>视图</td>
+                    <td>虚拟数据表，操作与实体表基本一致，但视图不属于模式</td>
+                </tr>
+                <tr>
+                    <td>视图 vs 存储过程</td>
+                    <td>视图是查询结果的虚拟表；存储过程是预编译的 SQL 语句集合</td>
+                </tr>
+                <tr>
+                    <td>数据备份 — 海量存储</td>
+                    <td>每次复制整个数据库</td>
+                </tr>
+                <tr>
+                    <td>数据备份 — 增量存储</td>
+                    <td>每次只存上次存储后被更新过的数据</td>
+                </tr>
+                <tr>
+                    <td>数据备份 — 静态存储</td>
+                    <td>在系统无法运行事务时进行的存储操作</td>
+                </tr>
+                <tr>
+                    <td>数据备份 — 动态存储</td>
+                    <td>转储期间允许数据库进行存取或修改的转储</td>
+                </tr>
+                <tr>
+                    <td>事务 ACID — 原子性(Atomicity)</td>
+                    <td>要么全做，要么不做</td>
+                </tr>
+                <tr>
+                    <td>事务 ACID — 一致性(Consistency)</td>
+                    <td>转账 A,B 总额不变</td>
+                </tr>
+                <tr>
+                    <td>事务 ACID — 隔离性(Isolation)</td>
+                    <td>数据库允许多个并发事务同时对其中的数据进行读/写和修改</td>
+                </tr>
+                <tr>
+                    <td>事务 ACID — 持久性(Durability)</td>
+                    <td>I/O 磁盘永久化，故障后数据不会丢失</td>
+                </tr>
+                <tr>
+                    <td>实体完整性规则</td>
+                    <td>主键唯一且不为空</td>
+                </tr>
+                <tr>
+                    <td>参照完整性约束</td>
+                    <td>参照完整性给出正确联系的约束条件</td>
+                </tr>
+                <tr>
+                    <td>用户定义完整性</td>
+                    <td>根据环境要求，加入特殊限制</td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="text-align:center;padding:40px 0;color:#6c757d">
+            <p>MySQL 知识点整理</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let width, height, stars = [], meteors = [];
+        function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight }
+        window.addEventListener('resize', resize); resize();
+        class Star { constructor() { this.x = Math.random() * width; this.y = Math.random() * height; this.size = Math.random() * 2; this.speedX = (Math.random() - 0.5) * 0.2; this.speedY = (Math.random() - 0.5) * 0.2; this.brightness = Math.random(); this.twinkleSpeed = 0.01 + Math.random() * 0.03 } update() { this.x += this.speedX; this.y += this.speedY; this.brightness += this.twinkleSpeed; if (this.brightness > 1 || this.brightness < 0) this.twinkleSpeed = -this.twinkleSpeed; if (this.x < 0) this.x = width; if (this.x > width) this.x = 0; if (this.y < 0) this.y = height; if (this.y > height) this.y = 0 } draw() { const alpha = Math.abs(this.brightness); ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,255,255,${alpha * 0.8})`; ctx.fill(); ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,255,255,${alpha * 0.1})`; ctx.fill() } }
+        class Meteor { constructor() { this.reset() } reset() { this.x = Math.random() * width + 200; this.y = -100; this.length = 100 + Math.random() * 150; this.speed = 8 + Math.random() * 12; this.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2; this.opacity = 1; this.active = true; this.width = 1 + Math.random() * 2 } update() { if (!this.active) return; this.x -= Math.cos(this.angle) * this.speed; this.y += Math.sin(this.angle) * this.speed; this.opacity -= 0.008; if (this.opacity <= 0 || this.y > height + 200 || this.x < -200) this.active = false } draw() { if (!this.active) return; const tailX = this.x + Math.cos(this.angle) * this.length; const tailY = this.y - Math.sin(this.angle) * this.length; const gradient = ctx.createLinearGradient(this.x, this.y, tailX, tailY); gradient.addColorStop(0, `rgba(0,212,255,${this.opacity})`); gradient.addColorStop(0.3, `rgba(100,200,255,${this.opacity * 0.6})`); gradient.addColorStop(1, `rgba(0,212,255,0)`); ctx.beginPath(); ctx.moveTo(this.x, this.y); ctx.lineTo(tailX, tailY); ctx.strokeStyle = gradient; ctx.lineWidth = this.width; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(this.x, this.y, 3, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,255,255,${this.opacity})`; ctx.fill(); ctx.beginPath(); ctx.arc(this.x, this.y, 8, 0, Math.PI * 2); ctx.fillStyle = `rgba(0,212,255,${this.opacity * 0.3})`; ctx.fill() } }
+        for (let i = 0; i < 200; i++)stars.push(new Star());
+        function animate() { ctx.fillStyle = 'rgba(10,14,39,0.15)'; ctx.fillRect(0, 0, width, height); stars.forEach(s => { s.update(); s.draw() }); if (Math.random() < 0.03) meteors.push(new Meteor()); meteors = meteors.filter(m => m.active); meteors.forEach(m => { m.update(); m.draw() }); requestAnimationFrame(animate) }
+        animate();
+    </script>
+</body>
+
+</html>

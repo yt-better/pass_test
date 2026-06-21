@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>期末复习资料</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Microsoft YaHei','Segoe UI',sans-serif;color:#e0e0e0;line-height:1.8;overflow-x:hidden;background:#0a0e27}
+#canvas-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+.container{max-width:1200px;margin:0 auto;padding:20px;position:relative;z-index:1}
+.header{text-align:center;padding:80px 20px 60px}
+.header h1{color:#00d4ff;font-size:3.5em;text-shadow:0 0 30px rgba(0,212,255,0.5);letter-spacing:5px;margin-bottom:15px}
+.header p{color:#8899aa;font-size:1.2em}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;padding:20px 0}
+.card{background:rgba(10,20,50,0.7);backdrop-filter:blur(10px);border:1px solid rgba(0,212,255,0.2);border-radius:20px;padding:40px 30px;text-align:center;transition:all 0.4s ease;cursor:pointer;text-decoration:none;color:#e0e0e0;display:block}
+.card:hover{transform:translateY(-10px);box-shadow:0 20px 60px rgba(0,212,255,0.2);border-color:rgba(0,212,255,0.5);background:rgba(10,20,50,0.9)}
+.card-icon{font-size:4em;margin-bottom:20px}
+.card h2{color:#00d4ff;font-size:1.8em;margin-bottom:15px}
+.card p{color:#8899aa;font-size:1em;line-height:1.6}
+.card-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px}
+.tag{background:rgba(0,212,255,0.1);color:#00d4ff;padding:4px 12px;border-radius:15px;font-size:0.85em;border:1px solid rgba(0,212,255,0.2)}
+.footer{text-align:center;padding:60px 20px 40px;color:#667788;font-size:0.9em}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.3)}
+::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.3);border-radius:4px}
+@media(max-width:768px){.header h1{font-size:2.2em}.card-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<canvas id="canvas-bg"></canvas>
+<div class="container">
+<div class="header">
+<h1>📚 期末复习资料</h1>
+<p>知识点整理</p>
+</div>
+
+<div class="card-grid">
+<a href="PassMySQL.html" class="card">
+<div class="card-icon">🗄️</div>
+<h2>MySQL 知识点</h2>
+<p>数据库原理、SQL语句、关系代数、E-R图设计、范式分解、事务与并发控制</p>
+<div class="card-tags">
+<span class="tag">两段封锁</span>
+<span class="tag">函数依赖</span>
+<span class="tag">3NF</span>
+<span class="tag">E-R图</span>
+<span class="tag">SQL</span>
+</div>
+</a>
+
+<a href="PassApplyCutStudy.html" class="card">
+<div class="card-icon">📊</div>
+<h2>应用统计学</h2>
+<p>抽样分布、参数估计、假设检验、置信区间、Z检验、t检验</p>
+<div class="card-tags">
+<span class="tag">正态分布</span>
+<span class="tag">区间估计</span>
+<span class="tag">假设检验</span>
+<span class="tag">Z检验</span>
+</div>
+</a>
+
+<a href="PassMaoGai.html" class="card">
+<div class="card-icon">📖</div>
+<h2>毛概知识点</h2>
+<p>马克思主义中国化、毛泽东思想、新民主主义革命、社会主义改造、邓小平理论</p>
+<div class="card-tags">
+<span class="tag">活的灵魂</span>
+<span class="tag">总路线</span>
+<span class="tag">社会主义本质</span>
+<span class="tag">市场经济</span>
+</div>
+</a>
+
+<a href="PassEnglish.html" class="card">
+<div class="card-icon">📖</div>
+<h2>英语听力</h2>
+<p>Listening Comprehension</p>
+<div class="card-tags">
+<span class="tag">News Report 1</span>
+<span class="tag">News Report 2</span>
+</div>
+</a>
+</div>
+
+<div class="footer">
+<p>🌟 祝考试顺利 · 逢考必过 🌟</p>
+<p style="margin-top:10px">2026年6月</p>
+</div>
+</div>
+
+<script>
+const canvas=document.getElementById('canvas-bg');
+const ctx=canvas.getContext('2d');
+let width,height,stars=[],meteors=[];
+function resize(){width=canvas.width=window.innerWidth;height=canvas.height=window.innerHeight}
+window.addEventListener('resize',resize);resize();
+class Star{constructor(){this.x=Math.random()*width;this.y=Math.random()*height;this.size=Math.random()*2;this.speedX=(Math.random()-0.5)*0.2;this.speedY=(Math.random()-0.5)*0.2;this.brightness=Math.random();this.twinkleSpeed=0.01+Math.random()*0.03}update(){this.x+=this.speedX;this.y+=this.speedY;this.brightness+=this.twinkleSpeed;if(this.brightness>1||this.brightness<0)this.twinkleSpeed=-this.twinkleSpeed;if(this.x<0)this.x=width;if(this.x>width)this.x=0;if(this.y<0)this.y=height;if(this.y>height)this.y=0}draw(){const alpha=Math.abs(this.brightness);ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${alpha*0.8})`;ctx.fill();ctx.beginPath();ctx.arc(this.x,this.y,this.size*3,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${alpha*0.1})`;ctx.fill()}}
+class Meteor{constructor(){this.reset()}reset(){this.x=Math.random()*width+200;this.y=-100;this.length=100+Math.random()*150;this.speed=8+Math.random()*12;this.angle=Math.PI/4+(Math.random()-0.5)*0.2;this.opacity=1;this.active=true;this.width=1+Math.random()*2}update(){if(!this.active)return;this.x-=Math.cos(this.angle)*this.speed;this.y+=Math.sin(this.angle)*this.speed;this.opacity-=0.008;if(this.opacity<=0||this.y>height+200||this.x<-200)this.active=false}draw(){if(!this.active)return;const tailX=this.x+Math.cos(this.angle)*this.length;const tailY=this.y-Math.sin(this.angle)*this.length;const gradient=ctx.createLinearGradient(this.x,this.y,tailX,tailY);gradient.addColorStop(0,`rgba(0,212,255,${this.opacity})`);gradient.addColorStop(0.3,`rgba(100,200,255,${this.opacity*0.6})`);gradient.addColorStop(1,`rgba(0,212,255,0)`);ctx.beginPath();ctx.moveTo(this.x,this.y);ctx.lineTo(tailX,tailY);ctx.strokeStyle=gradient;ctx.lineWidth=this.width;ctx.lineCap='round';ctx.stroke();ctx.beginPath();ctx.arc(this.x,this.y,3,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${this.opacity})`;ctx.fill();ctx.beginPath();ctx.arc(this.x,this.y,8,0,Math.PI*2);ctx.fillStyle=`rgba(0,212,255,${this.opacity*0.3})`;ctx.fill()}}
+for(let i=0;i<200;i++)stars.push(new Star());
+function animate(){ctx.fillStyle='rgba(10,14,39,0.15)';ctx.fillRect(0,0,width,height);stars.forEach(s=>{s.update();s.draw()});if(Math.random()<0.03)meteors.push(new Meteor());meteors=meteors.filter(m=>m.active);meteors.forEach(m=>{m.update();m.draw()});requestAnimationFrame(animate)}
+animate();
+</script>
+</body>
+</html>

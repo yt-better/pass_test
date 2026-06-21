@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语听力</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Microsoft YaHei','Segoe UI',sans-serif;color:#e0e0e0;line-height:1.8;overflow-x:hidden;background:#0a0e27}
+#canvas-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
+.container{max-width:900px;margin:0 auto;padding:20px;position:relative;z-index:1}
+h1{text-align:center;color:#00d4ff;font-size:2.5em;margin:30px 0;text-shadow:0 0 20px rgba(0,212,255,0.5);letter-spacing:5px}
+h2{color:#00d4ff;font-size:1.5em;margin:30px 0 15px;padding-bottom:10px;border-bottom:2px solid rgba(0,212,255,0.3)}
+.card{background:rgba(10,20,50,0.7);backdrop-filter:blur(10px);border:1px solid rgba(0,212,255,0.2);border-radius:15px;padding:25px;margin:20px 0;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.question{margin:15px 0;padding:15px;background:rgba(0,0,0,0.3);border-radius:10px;border-left:4px solid #ffd93d}
+.q-num{color:#ffd93d;font-weight:bold;font-size:1.1em;margin-bottom:10px}
+.answer{color:#51cf66;font-weight:bold;font-size:1.2em;margin-bottom:10px}
+.options{padding-left:20px}
+.options li{margin:8px 0;list-style:none;color:#c0c0c0}
+.options li.correct{color:#51cf66;font-weight:bold}
+.options li.correct::before{content:'✓ ';color:#51cf66}
+.options li::before{content:'○ ';color:#667788}
+.options li.correct::before{content:'● ';color:#51cf66}
+.source{color:#8899aa;font-size:0.9em;margin-top:10px;font-style:italic}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.3)}
+::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.3);border-radius:4px}
+@media(max-width:768px){h1{font-size:1.8em}.card{padding:15px}}
+</style>
+</head>
+<body>
+<canvas id="canvas-bg"></canvas>
+<div class="container">
+<h1>英语听力</h1>
+
+<h2>News Report 1</h2>
+<div class="card">
+<div class="question">
+<div class="q-num">Question 1</div>
+<div class="answer">Answer: A</div>
+<ul class="options">
+<li class="correct">A. See the Pope.</li>
+<li>B. Go to Newcastle.</li>
+<li>C. Travel to Germany.</li>
+<li>D. Tour an Italian city.</li>
+</ul>
+</div>
+<div class="question">
+<div class="q-num">Question 2</div>
+<div class="answer">Answer: D</div>
+<ul class="options">
+<li>A. He was taken to hospital in an ambulance.</li>
+<li>B. His car hit a sign and was badly damaged.</li>
+<li>C. His GPS system went out of order.</li>
+<li class="correct">D. He ended up in the wrong place.</li>
+</ul>
+</div>
+</div>
+
+<h2>News Report 2</h2>
+<div class="card">
+<div class="question">
+<div class="q-num">Question 3</div>
+<div class="answer">Answer: B</div>
+<ul class="options">
+<li>A. They lost contact with the emergency department.</li>
+<li class="correct">B. They were trapped in an underground elevator.</li>
+<li>C. They were injured by suddenly falling rocks.</li>
+<li>D. They sent calls for help via a portable radio.</li>
+</ul>
+</div>
+<div class="question">
+<div class="q-num">Question 4</div>
+<div class="answer">Answer: C</div>
+<ul class="options">
+<li>A. They tried hard to repair the elevator.</li>
+<li>B. They released the details of the accident.</li>
+<li class="correct">C. They sent supplies to keep the miners warm.</li>
+<li>D. They provided the miners with food and water.</li>
+</ul>
+</div>
+</div>
+
+<div style="text-align:center;padding:40px 0;color:#6c757d">
+<p>英语听力</p>
+</div>
+</div>
+
+<script>
+const canvas=document.getElementById('canvas-bg');
+const ctx=canvas.getContext('2d');
+let width,height,stars=[],meteors=[];
+function resize(){width=canvas.width=window.innerWidth;height=canvas.height=window.innerHeight}
+window.addEventListener('resize',resize);resize();
+class Star{constructor(){this.x=Math.random()*width;this.y=Math.random()*height;this.size=Math.random()*2;this.speedX=(Math.random()-0.5)*0.2;this.speedY=(Math.random()-0.5)*0.2;this.brightness=Math.random();this.twinkleSpeed=0.01+Math.random()*0.03}update(){this.x+=this.speedX;this.y+=this.speedY;this.brightness+=this.twinkleSpeed;if(this.brightness>1||this.brightness<0)this.twinkleSpeed=-this.twinkleSpeed;if(this.x<0)this.x=width;if(this.x>width)this.x=0;if(this.y<0)this.y=height;if(this.y>height)this.y=0}draw(){const alpha=Math.abs(this.brightness);ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${alpha*0.8})`;ctx.fill();ctx.beginPath();ctx.arc(this.x,this.y,this.size*3,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${alpha*0.1})`;ctx.fill()}}
+class Meteor{constructor(){this.reset()}reset(){this.x=Math.random()*width+200;this.y=-100;this.length=100+Math.random()*150;this.speed=8+Math.random()*12;this.angle=Math.PI/4+(Math.random()-0.5)*0.2;this.opacity=1;this.active=true;this.width=1+Math.random()*2}update(){if(!this.active)return;this.x-=Math.cos(this.angle)*this.speed;this.y+=Math.sin(this.angle)*this.speed;this.opacity-=0.008;if(this.opacity<=0||this.y>height+200||this.x<-200)this.active=false}draw(){if(!this.active)return;const tailX=this.x+Math.cos(this.angle)*this.length;const tailY=this.y-Math.sin(this.angle)*this.length;const gradient=ctx.createLinearGradient(this.x,this.y,tailX,tailY);gradient.addColorStop(0,`rgba(0,212,255,${this.opacity})`);gradient.addColorStop(0.3,`rgba(100,200,255,${this.opacity*0.6})`);gradient.addColorStop(1,`rgba(0,212,255,0)`);ctx.beginPath();ctx.moveTo(this.x,this.y);ctx.lineTo(tailX,tailY);ctx.strokeStyle=gradient;ctx.lineWidth=this.width;ctx.lineCap='round';ctx.stroke();ctx.beginPath();ctx.arc(this.x,this.y,3,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${this.opacity})`;ctx.fill();ctx.beginPath();ctx.arc(this.x,this.y,8,0,Math.PI*2);ctx.fillStyle=`rgba(0,212,255,${this.opacity*0.3})`;ctx.fill()}}
+for(let i=0;i<200;i++)stars.push(new Star());
+function animate(){ctx.fillStyle='rgba(10,14,39,0.15)';ctx.fillRect(0,0,width,height);stars.forEach(s=>{s.update();s.draw()});if(Math.random()<0.03)meteors.push(new Meteor());meteors=meteors.filter(m=>m.active);meteors.forEach(m=>{m.update();m.draw()});requestAnimationFrame(animate)}
+animate();
+</script>
+</body>
+</html>
